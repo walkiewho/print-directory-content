@@ -11,7 +11,7 @@ A Python script that recursively prints the contents of all files in a directory
 ## Installation
 ```bash
 git clone https://github.com/walkiewho/print-directory-content
-chmod +x print_directory_contents.py
+chmod +x print-directory-content/print_directory_contents.py
 ```
 
 ## Options
