@@ -16,21 +16,21 @@ def print_file(file_path: str, recursive_left=0, prefix=''):
 
         return None
 
-    print(f"FILE: \"{prefix}{os.path.basename(file_path)}\"\n```")
+    print(f"FILE: \"{prefix}{os.path.basename(file_path)}\"\n{separator_open}")
 
     if not is_text_file(file_path):
-        print("Файл бинарный, нет возможности прочитать")
+        print("<Binary file, can't read>")
     else:
         try:
             with open(file_path, mode='r', encoding='utf-8') as file:
                 print(file.read().strip())
         except FileNotFoundError:
-            print("Файл не найден")
+            print("File not found")
         except PermissionError:
-            print("Нет прав на чтение файла")
+            print("No permission to read file")
         except OSError as e:
-            print(f"Другая ошибка при открытии: {e}")
-    print('```\n')
+            print(f"Other error while opening file: {e}")
+    print(f'{separator_close}\n')
     return None
 
 
@@ -56,8 +56,15 @@ def is_text_file(file_path, sample_size=1024):
 
 def print_help(error=False):
     print("Usage: python print_directory_contents.py <DIRECTORY_PATH>")
-    print("Flags: -r --recursive Recursively print directories")
+    print("Flags: -r  --recursive       \tRecursively print directories")
+    print("       -t  --tree            \tPrint tree")
+    print("       -s  --separator       \tSets open and close brackets for content of file")
+    print("       -so --separator-open  \tSets open bracket for content of file (Has priority over -s)")
+    print("       -sc --separator-close \tSets close bracket for content of file (Has priority over -s)")
     exit(int(error))
+
+separator_open = ''
+separator_close = ''
 
 if __name__ == "__main__":
     if len(argv) < 2:
@@ -66,11 +73,12 @@ if __name__ == "__main__":
     path = ''
     recursive = 0
     print_tree = False
+    separator = '```'
 
     arg_index = 1
     while arg_index < len(argv):
         arg = argv[arg_index]
-        if arg == '-t' or arg == 'tree':
+        if arg == '-t' or arg == '--tree':
             print_tree = True
         elif arg == '-r' or arg == '--recursive':
             arg_index += 1
@@ -85,6 +93,33 @@ if __name__ == "__main__":
                 continue
 
             recursive = int(argv[arg_index])
+        elif arg == '-s' or arg == '--separator':
+            arg_index += 1
+
+            if len(argv) <= arg_index:
+                print_help(error=True)
+                break
+
+            arg = argv[arg_index]
+            separator = arg
+        elif arg == '-so' or arg == '--separator-open':
+            arg_index += 1
+
+            if len(argv) <= arg_index:
+                print_help(error=True)
+                break
+
+            arg = argv[arg_index]
+            separator_open = arg
+        elif arg == '-sc' or arg == '--separator-close':
+            arg_index += 1
+
+            if len(argv) <= arg_index:
+                print_help(error=True)
+                break
+
+            arg = argv[arg_index]
+            separator_close = arg
         elif arg[0] == '-':
             print_help()
         elif not path:
@@ -96,13 +131,17 @@ if __name__ == "__main__":
 
     if not path:
         print_help(error=True)
+    if not os.path.exists(path):
+        print("No such directory")
+        exit(1)
 
-
-    path = os.path.abspath(path)
+    separator_open = separator_open if separator_open else separator
+    separator_close = separator_close if separator_close else separator
 
     if print_tree:
-        os.system(f"tree {path} {f"-L {recursive + 1}" if recursive != -1 else ""}")
-    else:
-        print(path, end='\n\n')
+        if os.name == 'nt':  # Windows
+            os.system(f'tree "{path}" /F')
+        else:
+            os.system(f'tree "{path}" {f"-L {recursive + 1}" if recursive != -1 else ""}')
 
     print_directory(path, recursive)
