@@ -55,12 +55,12 @@ def is_text_file(file_path, sample_size=1024):
         return False
 
 def print_help(error=False):
-    print("Usage: python print_directory_contents.py <DIRECTORY_PATH>")
-    print("Flags: -r  --recursive       \tRecursively print directories")
-    print("       -t  --tree            \tPrint tree")
-    print("       -s  --separator       \tSets open and close brackets for content of file")
-    print("       -so --separator-open  \tSets open bracket for content of file (Has priority over -s)")
-    print("       -sc --separator-close \tSets close bracket for content of file (Has priority over -s)")
+    print("Usage: python print_directory_contents.py <DIRECTORY_PATH> -r [N] -t -so SEP -sc SEP")
+    print("Flags: -r  --recursive [N]      \tRecursively print subdirectories (N = depth, no value = infinite)")
+    print("       -t  --tree               \tDisplay directory tree")
+    print("       -s  --separator SEP      \tSets open and close separators for content of file")
+    print("       -so --separator-open SEP \tSets open separator for content of file (Has priority over -s)")
+    print("       -sc --separator-close SEP\tSets close separator for content of file (Has priority over -s)")
     exit(int(error))
 
 separator_open = ''
